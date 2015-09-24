@@ -1,0 +1,82 @@
+---
+title: "Assignment 3"
+output: html_document
+---
+
+### Predict annual restaurant sales based on objective measurements
+
+With tons of restaurants across the globe this business happens to be one of the most 
+popular businesses ever. Restaurants employ millions of people in all countries and make 
+significant daily investments in developing new restaurant sites. Right now, deciding 
+when and where to open new restaurants is largely a subjective process based on the 
+personal judgement and experience of development teams. This subjective data is difficult 
+to accurately extrapolate across geographies and cultures. New restaurant sites take 
+large investments of time and capital to get up and running. When the wrong location for 
+a restaurant brand is chosen, the site closes within 18 months and operating losses are 
+incurred. Finding a mathematical model to increase the effectiveness of investments in new restaurant 
+sites would allow employers to invest more in other important business areas, like 
+sustainability, innovation, and training for new employees. Using demographic, real estate, 
+and commercial data, this competition challenges you to predict the annual restaurant sales 
+of 100,000 regional locations. 
+
+### Description of data
+
+TFI is the company behind some of the world's most well-known 
+brands: Burger King, Sbarro, Popeyes, Usta Donerci, and Arby’s.
+TFI has provided a dataset with 137 restaurants in the training 
+set, and a test set of 100000 restaurants. The data columns include 
+the open date, location, city type, and three categories of obfuscated data: 
+Demographic data, Real estate data, and Commercial data. The revenue column 
+indicates a (transformed) revenue of the restaurant in a given year and is 
+the target of predictive analysis. 
+
+### Data fields
+
+* Id : Restaurant id. 
+* Open Date : opening date for a restaurant
+* City : City that the restaurant is in. Note that there are unicode in the names. 
+* City Group: Type of the city. Big cities, or Other. 
+* Type: Type of the restaurant. FC: Food Court, IL: Inline, DT: Drive Thru, MB: Mobile
+* P1, P2 - P37: There are three categories of these obfuscated data. Demographic data 
+are gathered from third party providers with GIS systems. These include population in 
+any given area, age and gender distribution, development scales. Real estate data mainly 
+relate to the m2 of the location, front facade of the location, car park availability. 
+Commercial data mainly include the existence of points of interest including schools, 
+banks, other QSR operators.
+* Revenue: The revenue column indicates a (transformed) revenue of the restaurant in a 
+given year and is the target of predictive analysis. Please note that the values are 
+transformed so they don't mean real dollar values. 
+
+```{r}
+Crime<-read.csv("/Users/Niloofar/Crimes2015.csv")
+Crime.Matrix<- as.matrix(Crime)
+library(ggplot2)
+library(ggmap)
+library(MASS)
+library(graphics)
+map <- get_map(location = 'chicago', zoom =11, source = 'google', filename = "Crime in Chicago") 
+Chicago<- ggmap(map, ylab = "Latitude", xlab = "Longitude")
+Chicago + geom_point(mapping = aes(x=Longitude,y=Latitude), data = Crime, size=0.005, colour="red", shape=0, na.rm = TRUE)
+latitude<-as.numeric(Crime.Matrix[,20])
+plot(density(latitude, na.rm =T),main="Univariate density of thefts of 2015 over latitude")
+longitude<-as.numeric(Crime.Matrix[,21])
+latitude1 <- na.omit(latitude)
+longitude1<-na.omit(longitude)
+bandwidth.nrd(latitude1)
+bandwidth.nrd(longitude1)
+library(MASS)
+kde2d = kde2d(latitude1,longitude1,n=50, h=c(0.04,0.03))
+x=kde2d$x
+y=kde2d$y
+z=kde2d$z
+library(graphics)
+persp(x,y,z,xlab="Lat",ylab="Long",zlab="Density",col="grey",theta = 0 , phi = 45)
+```
+
+You can also embed plots, for example:
+
+```{r, echo=FALSE}
+
+```
+
+
